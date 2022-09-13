@@ -1,0 +1,107 @@
+{
+  "Maximum Relays Per Event": 1,
+  "Maximum Relays Per Swimmer": 3,
+  "Average Power Points": 694.0,
+  "Lineup": {
+    "4x50fr": [
+      [
+        [
+          "Max Oberg",
+          "20.64"
+        ],
+        [
+          "Leo Yang",
+          "21.10"
+        ],
+        [
+          "Lucas Abounader",
+          "21.22"
+        ],
+        [
+          "Evan Zhang",
+          "21.23"
+        ]
+      ]
+    ],
+    "4x100fr": [
+      [
+        [
+          "Max Oberg",
+          "45.17"
+        ],
+        [
+          "Naci Keskin",
+          "45.67"
+        ],
+        [
+          "Lucas Abounader",
+          "45.97"
+        ],
+        [
+          "Leo Yang",
+          "46.38"
+        ]
+      ]
+    ],
+    "4x200fr": [
+      [
+        [
+          "Naci Keskin",
+          "1:39.21"
+        ],
+        [
+          "Max Oberg",
+          "1:39.49"
+        ],
+        [
+          "Christopher Pukszta",
+          "1:40.19"
+        ],
+        [
+          "Leo Yang",
+          "1:40.25"
+        ]
+      ]
+    ],
+    "4x50mr": [
+      [
+        [
+          "Naci Keskin",
+          "24.11"
+        ],
+        [
+          "Jason Lin",
+          "25.85"
+        ],
+        [
+          "Pierre Zeineddin",
+          "22.71"
+        ],
+        [
+          "Evan Zhang",
+          "21.23"
+        ]
+      ]
+    ],
+    "4x100mr": [
+      [
+        [
+          "Christopher Pukszta",
+          "52.13"
+        ],
+        [
+          "Jason Lin",
+          "55.11"
+        ],
+        [
+          "Pierre Zeineddin",
+          "49.34"
+        ],
+        [
+          "Lucas Abounader",
+          "45.97"
+        ]
+      ]
+    ]
+  }
+}

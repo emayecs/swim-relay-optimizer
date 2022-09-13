@@ -1,10 +1,8 @@
-from lib2to3.pytree import convert
-from re import L
 import PyPDF2, pprint, json, math
+from time import perf_counter
 import itertools as itt
 
 printer = pprint.PrettyPrinter()
-
 EVENTS = [
     "4x50fr",
     "4x100fr",
@@ -277,7 +275,6 @@ def medley_relay_teams(rankings, excluded_swimmers, relays_per_event):
                     best_team = team
                     best_time = total_time
             teams.append(best_team)
-        
 
         to_exclude = []
         for pair in teams[-1]:
@@ -405,7 +402,7 @@ def generate_lineup(all_rankings, excluded_swimmers_2d, relays_per_event = 3):
                         swimmer_events[name].append(event_index)
     return swimmer_events, relay_groups
 
-def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, relays_per_event):
+def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, relays_per_event, top_events):
     '''
     Returns a list of all possible lineups.
 
@@ -492,21 +489,27 @@ def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, rel
     for i, forbidden_swimmers in enumerate(exceeded_permutations):
         swimmer_events, relay_groups = generate_lineup(rankings, forbidden_swimmers, relays_per_event)
         this_swimmer_combinations = generate_swimmer_combinations(swimmer_events, relays_per_swimmer)
-        # recursively call this function with the new restriction
+
+        not_optimal = False
+        # if a top swimmer is not swimming their minimum number of events, the lineup is not optimal
+        for name, minimum_events in top_events.items():
+            current_number_of_events = len(swimmer_events[name])
+            if current_number_of_events < minimum_events:
+                not_optimal = True
+                break
+        if not_optimal:
+            continue
         if len(this_swimmer_combinations.keys()) > 0:
+            # at least one swimmer is signed up to swim more than ``relays_per_swimmer`` relays
             for swimmer, combinations in swimmer_combinations.items():
                 this_swimmer_combinations[swimmer] = combinations
-            generated_lineups = generate_all_lineups(this_swimmer_combinations, rankings, relays_per_swimmer, relays_per_event)
+            # recursively call this function with the new restriction
+            generated_lineups = generate_all_lineups(this_swimmer_combinations, rankings, relays_per_swimmer, relays_per_event, top_events)
             for lineup in generated_lineups:
                 if lineup not in lineups:
                     lineups.append(lineup)
         else:
             if (swimmer_events, relay_groups) not in lineups:
-                if len(swimmer_events["Leo Yang"]) == 2:
-                    print(swimmer_events["Leo Yang"])
-                    printer.pprint(rankings)
-                with open("test","a") as f:
-                    f.write(str(swimmer_events)+'\n')
                 lineups.append((swimmer_events, relay_groups))
     
     return lineups
@@ -515,14 +518,40 @@ def main():
     printer = pprint.PrettyPrinter()
 
     # extract rankings
-    rankings = {}
+    all_rankings = {}
     for event in INDIVIDUAL_EVENTS:
-        rankings[event] = extract_rankings(f"California Institute of Technology - Top Times - {event}.pdf", "California Institute of Technology")
+        all_rankings[event] = extract_rankings(f"California Institute of Technology - Top Times - {event}.pdf", "California Institute of Technology")
 
     relays_per_event = 1
     relays_per_swimmer = 3
 
-    lineups = generate_all_lineups({}, rankings, relays_per_swimmer, relays_per_event)
+    events_in_top_rankings = {}
+
+    for event in INDIVIDUAL_EVENTS:
+        rankings = all_rankings[event]
+        cap = (relays_per_event * 4) if event in FREE_RELAYS.values() else relays_per_event
+        for i, pair in enumerate(rankings):
+            if i == cap:
+                break
+            name = pair[0]
+            if name not in events_in_top_rankings.keys():
+                events_in_top_rankings[name] = 1
+                # count twice for free legs in medley relays
+                if (event == "50fr" or event == "100fr") and i < relays_per_event:
+                    events_in_top_rankings[name] = 2
+            else:
+                events_in_top_rankings[name] += 1
+                # count twice for free legs in medley relays
+                if (event == "50fr" or event == "100fr") and i < relays_per_event:
+                    events_in_top_rankings[name] += 1
+    
+    # make sure each swimmer is swimming under limit of relays
+    # ``event_in_top_rankings`` should now contain the minimum relays each swimmer should be apart of for each swimmer in the dict
+    for name, events in events_in_top_rankings.items():
+        events_in_top_rankings[name] = min(events, relays_per_swimmer)
+
+    t0 = perf_counter()
+    lineups = generate_all_lineups({}, all_rankings, relays_per_swimmer, relays_per_event, events_in_top_rankings)
 
     best_lineup = None
     best_points = 0
@@ -548,10 +577,15 @@ def main():
             best_lineup = lineup
             best_points = total_points
 
-    with open('lineups.json','w') as f:
-        json.dump([best_lineup,total_points],f,indent = 2)
+    with open(f'best_lineup_{relays_per_event}_rpe_{relays_per_swimmer}_rps.json','w') as f:
+        json.dump({
+            "Maximum Relays Per Event":relays_per_event,
+            "Maximum Relays Per Swimmer":relays_per_swimmer,
+            "Average Power Points":total_points,
+            "Lineup":best_lineup[1],
+        },f,indent = 2)
     print("Done.")
-
+    print(perf_counter()-t0)
 
 if __name__=="__main__":
     main()
