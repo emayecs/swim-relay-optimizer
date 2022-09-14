@@ -3,6 +3,7 @@ from time import perf_counter
 import itertools as itt
 
 printer = pprint.PrettyPrinter()
+count = 0
 EVENTS = [
     "4x50fr",
     "4x100fr",
@@ -184,23 +185,31 @@ def remove_swimmer_from_mr_rankings(rankings, excluded_swimmers):
     return modified_rankings
 
 def medley_relay_repeats(rankings, team, excluded_swimmers):
-    printer = pprint.PrettyPrinter()
+    global count
     new_team = team.copy()
     name_count = {}
 
     possible_teams = []
 
     for i, pair in enumerate(team):
+        stroke_rankings = rankings[i]
         if pair is None:
-            if len(rankings[i]) == 0:
+            if len(stroke_rankings) == 0:
                 return []
-            new_team[i] = rankings[i][0]
+            new_team[i] = stroke_rankings[0]
         name = new_team[i][0]
         if name not in name_count.keys():
             name_count[name] = [i]
         else:
             name_count[name].append(i)
     
+    # if count < 6:
+    #     print("team: "+str(team))
+    #     print("new_team: "+str(new_team))
+    #     print("name_count: "+str(name_count))
+    #     print('\n')
+    #     count += 1
+
     for name in name_count.keys():
         indices = name_count[name]
         if len(indices) > 1:
@@ -208,11 +217,11 @@ def medley_relay_repeats(rankings, team, excluded_swimmers):
             temp_rankings = remove_swimmer_from_mr_rankings(rankings, excluded_swimmers + [name])
             combinations = list(itt.combinations(indices, len(indices)-1))
             for combination in combinations:
-                temp_team = team.copy()
+                temp_team = new_team.copy()
                 for index in combination:
                     temp_team[index] = None
                 possible_teams += medley_relay_repeats(temp_rankings, temp_team, excluded_swimmers)
-    
+
     if len(possible_teams) == 0:
         possible_teams.append(new_team)
 
@@ -226,55 +235,21 @@ def medley_relay_teams(rankings, excluded_swimmers, relays_per_event):
     teams = []
 
     # generate ``relays_per_event`` medley relay teams
-    for i in range(relays_per_event):
-        printer = pprint.PrettyPrinter()
-        team = []
-        name_count = {}
+    for _ in range(relays_per_event):
+        possible_teams = medley_relay_repeats(modified_rankings, [None, None, None, None], excluded_swimmers)
 
-        possible_teams = []
-        out_of_swimmers = False
-        for i, stroke_rankings in enumerate(modified_rankings):
-            if len(stroke_rankings) == 0:
-                out_of_swimmers = True
-                break
-            pair = stroke_rankings[0]
-            team.append(pair)
-            name = pair[0]
-            if name not in name_count.keys():
-                name_count[name] = [i]
-            else:
-                name_count[name].append(i)
+        best_time = 0
+        best_team = []
+        for team in possible_teams:
+            total_time = 0
+            for pair in team:
+                time = convert_time_to_seconds(pair[1])
+                total_time += time
+            if best_team == [] or total_time < best_time:
+                best_team = team
+                best_time = total_time
 
-        if out_of_swimmers:
-            break
-        # team contains the fastest swimmer for each stroke, regardless of repeats
-
-        for name in name_count.keys():
-            indices = name_count[name]
-            if len(indices) > 1:
-                # swimmer is first for multiple legs of the relay
-                temp_rankings = remove_swimmer_from_mr_rankings(modified_rankings, excluded_swimmers + [name])
-                combinations = list(itt.combinations(indices, len(indices)-1))
-                for combination in combinations:
-                    temp_team = team.copy()
-                    for index in combination:
-                        temp_team[index] = None
-                    possible_teams += medley_relay_repeats(temp_rankings, temp_team, excluded_swimmers)
-
-        if len(possible_teams) == 0:
-            teams.append(team)
-        else:
-            best_time = 0
-            best_team = None
-            for team in possible_teams:
-                total_time = 0
-                for pair in team:
-                    time = convert_time_to_seconds(pair[1])
-                    total_time += time
-                if best_team is None or total_time < best_time:
-                    best_team = team
-                    best_time = total_time
-            teams.append(best_team)
+        teams.append(best_team)
 
         to_exclude = []
         for pair in teams[-1]:
@@ -445,8 +420,6 @@ def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, rel
             combination_arrays.append(combination_array)
         swimmer_combination_arrays.append(combination_arrays)
 
-    #printer.pprint(swimmer_combination_arrays)
-
     indices = generate_indices(len(swimmer_combination_arrays))
 
     exceeded_permutations = []
@@ -493,6 +466,9 @@ def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, rel
         not_optimal = False
         # if a top swimmer is not swimming their minimum number of events, the lineup is not optimal
         for name, minimum_events in top_events.items():
+            if name not in swimmer_events:
+                not_optimal = True
+                break
             current_number_of_events = len(swimmer_events[name])
             if current_number_of_events < minimum_events:
                 not_optimal = True
@@ -513,14 +489,21 @@ def generate_all_lineups(swimmer_combinations, rankings, relays_per_swimmer, rel
                 lineups.append((swimmer_events, relay_groups))
     
     return lineups
+
+def write_rankings(rankings):
+    with open('rankings.txt','w') as f:
+        for event, list in rankings.items():
+            f.write(event+'\n')
+            f.write(str(list)+'\n')
     
 def main():
-    printer = pprint.PrettyPrinter()
-
     # extract rankings
     all_rankings = {}
+    school_name = "California Institute of Technology"
     for event in INDIVIDUAL_EVENTS:
-        all_rankings[event] = extract_rankings(f"California Institute of Technology - Top Times - {event}.pdf", "California Institute of Technology")
+        all_rankings[event] = extract_rankings(f"times/{school_name} - Top Times - {event}.pdf", school_name)
+
+    write_rankings(all_rankings)
 
     relays_per_event = 1
     relays_per_swimmer = 3
@@ -551,6 +534,8 @@ def main():
         events_in_top_rankings[name] = min(events, relays_per_swimmer)
 
     t0 = perf_counter()
+
+    print("Finding best lineup...")
     lineups = generate_all_lineups({}, all_rankings, relays_per_swimmer, relays_per_event, events_in_top_rankings)
 
     best_lineup = None
@@ -581,7 +566,7 @@ def main():
         json.dump({
             "Maximum Relays Per Event":relays_per_event,
             "Maximum Relays Per Swimmer":relays_per_swimmer,
-            "Average Power Points":total_points,
+            "Average Power Points":best_points,
             "Lineup":best_lineup[1],
         },f,indent = 2)
     print("Done.")
