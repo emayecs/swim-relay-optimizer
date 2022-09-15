@@ -1,10 +1,6 @@
-import PyPDF2, pprint, json, math
+import PyPDF2, json, math, pprint
 import itertools as itt
 from time import perf_counter
-
-count = 0
-printer = pprint.PrettyPrinter()
-all_event_combinations = []
 
 EVENTS = [
     "4x50fr",
@@ -208,7 +204,6 @@ def remove_swimmers_from_rankings(rankings, excluded_swimmers):
     return modified_rankings
 
 def medley_relay_repeats(rankings, team, excluded_swimmers):
-    global count
     new_team = team.copy()
     name_count = {}
 
@@ -385,9 +380,7 @@ def generate_lineup(all_rankings, excluded_swimmers_2d):
                         swimmer_events[name].append(event_index)
     return swimmer_events, relay_groups
 
-def generate_all_lineups(prev_event_combinations, rankings, relays_per_swimmer, top_events, restricted_swimmers):
-    global count, all_event_combinations
-    count += 1
+def generate_all_lineups(prev_event_combinations, rankings, relays_per_swimmer, top_events, restricted_swimmers, all_event_combinations):
     '''
     Returns a list of all possible lineups.
 
@@ -422,6 +415,8 @@ def generate_all_lineups(prev_event_combinations, rankings, relays_per_swimmer, 
     # of ``forbidden_events`` is the swimmer's name, then the swimmer cannot swim the ``i``th event.
     
     forbidden_swimmer_arrays = []
+    
+    updated_event_combinations = all_event_combinations.copy()
 
     # convert swimmer_combinations to string form
     for swimmer, combinations in prev_event_combinations.items():
@@ -501,16 +496,17 @@ def generate_all_lineups(prev_event_combinations, rankings, relays_per_swimmer, 
             for swimmer, combinations in prev_event_combinations.items():
                 if swimmer not in event_combinations.keys():
                     event_combinations[swimmer] = combinations
-            if event_combinations in all_event_combinations:
+            if event_combinations in updated_event_combinations:
                 continue
-            all_event_combinations.append(event_combinations)
-            generated_lineups = generate_all_lineups(event_combinations, rankings, relays_per_swimmer, top_events, restricted_swimmers)
+            updated_event_combinations.append(event_combinations)
+            generated_lineups, new_event_combinations = generate_all_lineups(event_combinations, rankings, relays_per_swimmer, top_events, restricted_swimmers, updated_event_combinations)
             lineups += generated_lineups
+            updated_event_combinations = new_event_combinations
 
         else:
             lineups.append((swimmer_events, relay_groups))
     
-    return lineups
+    return lineups, updated_event_combinations
 
 def write_rankings(rankings):
     with open('rankings.txt','w') as f:
@@ -614,7 +610,6 @@ def remove_swimmers_from_all_rankings(rankings, excluded_swimmers):
     return modified_rankings
 
 def find_best_lineup(relays_per_event, relays_per_swimmer, school_name, gender):
-    global count, all_event_combinations
     all_rankings = extract_all_rankings(school_name, gender)
 
     complete_lineup = {
@@ -629,15 +624,14 @@ def find_best_lineup(relays_per_event, relays_per_swimmer, school_name, gender):
     total_event_indices = {}
 
     for i in range(relays_per_event):
-        all_event_combinations.clear()
+        # all_event_combinations.clear()
         t0 = perf_counter()
         team_name = TEAM_NAMES[i]
         print(f"Finding best lineup for {team_name}...")
 
         minimum_events = swimmer_minimum_events(modified_rankings, relays_per_swimmer, event_combinations)
 
-        lineups = generate_all_lineups(event_combinations, modified_rankings, relays_per_swimmer, minimum_events, restricted_swimmers)
-        # printer.pprint(lineups)
+        lineups, _ = generate_all_lineups(event_combinations, modified_rankings, relays_per_swimmer, minimum_events, restricted_swimmers, [])
         lineup, points = best_lineup(lineups, gender)
         swimmer_events = lineup[0]
         relay_teams = lineup[1]
@@ -673,8 +667,6 @@ def find_best_lineup(relays_per_event, relays_per_swimmer, school_name, gender):
 
     with open(f'lineup_{relays_per_event}_rpe_{relays_per_swimmer}_rps_{gender}.json','w') as f:
         json.dump(complete_lineup,f,indent = 2)
-
-    print(count)
 
     print(f"Finished.")
     
