@@ -703,8 +703,6 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
     
 
 def main():
-    with open('lineups.txt','w') as f:
-        pass
     school_name = "California Institute of Technology"
     gender = "female"
     relays_per_event = 3
