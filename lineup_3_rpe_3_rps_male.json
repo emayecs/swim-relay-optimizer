@@ -1,0 +1,319 @@
+{
+  "Maximum Relays Per Event": 3,
+  "Maximum Relays Per Swimmer": 3,
+  "A Team": {
+    "Average Points Per Relay": 699.8,
+    "Lineup": {
+      "4x50fr": [
+        [
+          [
+            "Max Oberg",
+            "20.64"
+          ],
+          [
+            "Leo Yang",
+            "21.10"
+          ],
+          [
+            "Lucas Abounader",
+            "21.22"
+          ],
+          [
+            "Evan Zhang",
+            "21.23"
+          ]
+        ]
+      ],
+      "4x100fr": [
+        [
+          [
+            "Max Oberg",
+            "45.17"
+          ],
+          [
+            "Naci Keskin",
+            "45.67"
+          ],
+          [
+            "Lucas Abounader",
+            "45.97"
+          ],
+          [
+            "Leo Yang",
+            "46.38"
+          ]
+        ]
+      ],
+      "4x200fr": [
+        [
+          [
+            "Naci Keskin",
+            "1:39.21"
+          ],
+          [
+            "Max Oberg",
+            "1:39.49"
+          ],
+          [
+            "Christopher Pukszta",
+            "1:40.19"
+          ],
+          [
+            "Leo Yang",
+            "1:40.25"
+          ]
+        ]
+      ],
+      "4x50mr": [
+        [
+          [
+            "Naci Keskin",
+            "24.11"
+          ],
+          [
+            "Jason Lin",
+            "25.85"
+          ],
+          [
+            "Pierre Zeineddin",
+            "22.71"
+          ],
+          [
+            "Evan Zhang",
+            "21.23"
+          ]
+        ]
+      ],
+      "4x100mr": [
+        [
+          [
+            "Christopher Pukszta",
+            "52.13"
+          ],
+          [
+            "Jason Lin",
+            "55.11"
+          ],
+          [
+            "Pierre Zeineddin",
+            "49.34"
+          ],
+          [
+            "Lucas Abounader",
+            "45.97"
+          ]
+        ]
+      ]
+    }
+  },
+  "B Team": {
+    "Average Points Per Relay": 604.0,
+    "Lineup": {
+      "4x50fr": [
+        [
+          [
+            "Sam Small",
+            "21.47"
+          ],
+          [
+            "Christopher Pukszta",
+            "21.63"
+          ],
+          [
+            "Tom Barrett",
+            "22.24"
+          ],
+          [
+            "Jay Dong",
+            "22.59"
+          ]
+        ]
+      ],
+      "4x100fr": [
+        [
+          [
+            "Evan Zhang",
+            "46.87"
+          ],
+          [
+            "Sam Small",
+            "47.09"
+          ],
+          [
+            "Jason Lin",
+            "47.66"
+          ],
+          [
+            "Rafael Santiago",
+            "48.72"
+          ]
+        ]
+      ],
+      "4x200fr": [
+        [
+          [
+            "Pierre Zeineddin",
+            "1:45.30"
+          ],
+          [
+            "Rohan Kolhe",
+            "1:47.59"
+          ],
+          [
+            "Tom Barrett",
+            "1:49.03"
+          ],
+          [
+            "Nathan McAlister",
+            "1:49.26"
+          ]
+        ]
+      ],
+      "4x50mr": [
+        [
+          [
+            "George Wythes",
+            "25.69"
+          ],
+          [
+            "Joshua Lee",
+            "27.28"
+          ],
+          [
+            "Andrew Pasco",
+            "23.44"
+          ],
+          [
+            "Tom Barrett",
+            "22.24"
+          ]
+        ]
+      ],
+      "4x100mr": [
+        [
+          [
+            "George Wythes",
+            "53.18"
+          ],
+          [
+            "Tao Zhang",
+            "58.87"
+          ],
+          [
+            "Andrew Pasco",
+            "50.77"
+          ],
+          [
+            "Sam Small",
+            "47.09"
+          ]
+        ]
+      ]
+    }
+  },
+  "C Team": {
+    "Average Points Per Relay": 553.4,
+    "Lineup": {
+      "4x50fr": [
+        [
+          [
+            "Tao Zhang",
+            "22.66"
+          ],
+          [
+            "Tyler Mapes",
+            "22.88"
+          ],
+          [
+            "Rohan Kolhe",
+            "23.02"
+          ],
+          [
+            "Nathan McAlister",
+            "23.47"
+          ]
+        ]
+      ],
+      "4x100fr": [
+        [
+          [
+            "Tyler Mapes",
+            "49.19"
+          ],
+          [
+            "Rohan Kolhe",
+            "49.87"
+          ],
+          [
+            "Jay Dong",
+            "49.90"
+          ],
+          [
+            "Joshua Lee",
+            "50.50"
+          ]
+        ]
+      ],
+      "4x200fr": [
+        [
+          [
+            "Tyler Mapes",
+            "1:49.43"
+          ],
+          [
+            "Andrew Pasco",
+            "1:50.03"
+          ],
+          [
+            "George Wythes",
+            "1:50.85"
+          ],
+          [
+            "Rafael Santiago",
+            "1:52.55"
+          ]
+        ]
+      ],
+      "4x50mr": [
+        [
+          [
+            "Jake Goldman",
+            "25.76"
+          ],
+          [
+            "Tao Zhang",
+            "27.47"
+          ],
+          [
+            "Shoonhsin Li",
+            "23.93"
+          ],
+          [
+            "Jay Dong",
+            "22.59"
+          ]
+        ]
+      ],
+      "4x100mr": [
+        [
+          [
+            "Jake Goldman",
+            "54.55"
+          ],
+          [
+            "Joshua Lee",
+            "58.94"
+          ],
+          [
+            "Shoonhsin Li",
+            "51.07"
+          ],
+          [
+            "Rafael Santiago",
+            "48.72"
+          ]
+        ]
+      ]
+    }
+  }
+}
