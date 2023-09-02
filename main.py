@@ -130,9 +130,9 @@ def read_pdf(file_name):
     '''
     text = ""
     with open(file_name, "rb") as pdfFileObj:
-        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-        pageObj = pdfReader.getPage(0)
-        text = pageObj.extractText()
+        pdfReader = PyPDF2.PdfReader(pdfFileObj)
+        pageObj = pdfReader.pages[0]
+        text = pageObj.extract_text()
     return text
 
 def generate_indices(length):
