@@ -1,7 +1,9 @@
 import PyPDF2, json, math
 import itertools as itt
 from time import perf_counter
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+
+SwimmerTime = namedtuple("SwimmerTime", ["name", "time"])
 
 MEDLEY_RELAY_INDICES = [3, 4]
 RELAY_EVENTS = [
@@ -138,7 +140,7 @@ def extract_rankings(file_name: str, team_name:str):
                 name_index = j
                 break
         time = convert_time_to_seconds(time_data[name_index:])
-        rankings.append((name, time))
+        rankings.append(SwimmerTime(name, time))
 
     return rankings
 
@@ -213,8 +215,8 @@ def generate_event_combinations(swimmer_events : dict[str, list[int]],
 
     return swimmer_exceeded_limit, swimmer_combinations
 
-def remove_swimmers_from_rankings(rankings: list[list[tuple[str,str]]], 
-                                  excluded_swimmers):
+def remove_swimmers_from_rankings(rankings: list[list[SwimmerTime]], 
+                                  excluded_swimmers: list[str]):
     '''
     Removes a swimmer from the rankings.
     '''
@@ -223,16 +225,16 @@ def remove_swimmers_from_rankings(rankings: list[list[tuple[str,str]]],
         modified_rankings.append(stroke_rankings.copy())
     
     for i, stroke_rankings in enumerate(rankings):
-        for pair in stroke_rankings:
-            name = pair[0]
+        for swimmer_time in stroke_rankings:
+            name = swimmer_time.name
             if name in excluded_swimmers:
-                modified_rankings[i].remove(pair)
+                modified_rankings[i].remove(swimmer_time)
     return modified_rankings
 
-def medley_relay_helper(rankings: list[list[tuple[str,str]]], 
-                         team: list[tuple[str,str]],
+def medley_relay_helper(rankings: list[list[SwimmerTime]], 
+                         team: list[SwimmerTime],
                          excluded_swimmers: list[str]
-                         ) -> list[list[tuple[str,str]]]:
+                         ) -> list[list[SwimmerTime]]:
     '''
     Returns a list of possible medley relay teams that are selected greedily.
     '''
@@ -242,19 +244,18 @@ def medley_relay_helper(rankings: list[list[tuple[str,str]]],
 
     possible_teams = []
 
-    for i, pair in enumerate(team):
+    for i, swimmer_time in enumerate(team):
         stroke_rankings = rankings[i]
         idx = 0
-        while idx < len(stroke_rankings) and stroke_rankings[idx][0] in excluded_swimmers:
+        while idx < len(stroke_rankings) and stroke_rankings[idx].name in excluded_swimmers:
             idx += 1
         if idx == len(stroke_rankings):
             return [new_team]
-        
-        if pair is None:
+        if swimmer_time is None:
             if len(stroke_rankings) == 0:
                 return []
             new_team[i] = stroke_rankings[idx]
-        name = new_team[i][0]
+        name = new_team[i].name
         name_count[name].append(i)
 
     # TODO: this can be slightly optimized but it'll be very insignificant
@@ -263,7 +264,7 @@ def medley_relay_helper(rankings: list[list[tuple[str,str]]],
         if len(indices) > 1:
             # swimmer is first for multiple legs of the relay
             temp_rankings = remove_swimmers_from_rankings(rankings, [name])
-            combinations = list(itt.combinations(indices, len(indices)-1))
+            combinations = list(itt.combinations(indices, 1))
             for combination in combinations:
                 temp_team = new_team.copy()
                 for index in combination:
@@ -275,7 +276,7 @@ def medley_relay_helper(rankings: list[list[tuple[str,str]]],
 
     return possible_teams
 
-def medley_relay_team(rankings: list[list[tuple[str,str]]],
+def medley_relay_team(rankings: list[list[SwimmerTime]],
                       excluded_swimmers: list[str]):
     possible_teams = medley_relay_helper(rankings, [None, None, None, None], excluded_swimmers)
 
@@ -285,8 +286,8 @@ def medley_relay_team(rankings: list[list[tuple[str,str]]],
         if None in team:
             continue
         total_time = 0
-        for pair in team:
-            time = pair[1]
+        for swimmer_time in team:
+            time = swimmer_time.time
             total_time += time
         if best_team is None or total_time < best_time:
             best_team = team
@@ -295,8 +296,8 @@ def medley_relay_team(rankings: list[list[tuple[str,str]]],
     return best_team
 
 def free_relay_team(
-        rankings: list[tuple[str,str]], 
-        team: list[tuple[str,str]],
+        rankings: list[SwimmerTime], 
+        team: list[SwimmerTime],
         excluded_swimmers : list[str]
     ) -> list[tuple[str, str]]:
     '''
@@ -316,22 +317,26 @@ def free_relay_team(
     '''
 
     names = []
-    for pair in team:
-        if pair is None:
+    for swimmer_time in team:
+        if swimmer_time is None:
             continue
-        names.append(pair[0])
+        names.append(swimmer_time.name)
             
     curr_team = team.copy()
     idx = 0
-    for i, pair in enumerate(team):
-        if pair is not None:
+    for i, swimmer_time in enumerate(team):
+        if swimmer_time is not None:
             continue
-        while (idx < len(rankings) and (rankings[idx][0] in names or rankings[idx][0] in excluded_swimmers)):
-            idx += 1
+        while (idx < len(rankings)):
+            name = rankings[idx].name
+            if name in names or name in excluded_swimmers:
+                idx += 1
+                continue
+            break
         if idx == len(rankings):
             break
         curr_team[i] = rankings[idx]
-        names.append(rankings[idx][0])
+        names.append(rankings[idx].name)
         idx += 1
     return curr_team
 
@@ -359,16 +364,16 @@ def get_swimmer_combinations(
     return all_combinations
 
 def generate_lineup(
-        all_rankings: dict[str, list[tuple[str,str]]], 
+        all_rankings: dict[str, list[SwimmerTime]], 
         names: list[str],
         combination: list[list[int]],
-        relay_teams: dict[str, list[tuple[str,str]]],
+        relay_teams: dict[str, list[SwimmerTime]],
         swimmer_event_limits: dict[str, int],
         previous_assigned_events: dict[str, list[int]],
         relays_per_swimmer: int
                             ) -> tuple[
                                 dict[str, list[int]], 
-                                dict[str, list[tuple[str,str]]]
+                                dict[str, list[SwimmerTime]]
                                 ]:
     '''
     Returns a lineup for all relays.
@@ -406,10 +411,10 @@ def generate_lineup(
     event_idx = 0
     for event, team in relay_teams.items():
         tc = team.copy()
-        for i, pair in enumerate(team):
-            if pair is None:
+        for i, swimmer_time in enumerate(team):
+            if swimmer_time is None:
                 continue
-            name = pair[0]
+            name = swimmer_time.name
             if event_idx not in swimmer_events[name]:
                 tc[i] = None
         curr_relay_teams[event] = tc
@@ -424,10 +429,10 @@ def generate_lineup(
         if None not in team:
             # team is filled with swimmers
             continue
-        for i, pair in enumerate(team):
-            if pair is None:
+        for i, swimmer_time in enumerate(team):
+            if swimmer_time is None:
                 continue
-            name = pair[0]
+            name = swimmer_time.name
             limit = swimmer_event_limits[name] if name in swimmer_event_limits.keys() else relays_per_swimmer
             if len(swimmer_events[name]) == limit:
                 #condition is necessary to only add events once, otherwise 
@@ -472,8 +477,8 @@ def generate_lineup(
             
             curr_relay_teams[relay_name] = relay_team
 
-            for pair in relay_team:
-                name = pair[0]
+            for swimmer_time in relay_team:
+                name = swimmer_time.name
                 if event_index not in swimmer_events[name]:
                     swimmer_events[name].append(event_index)
         else:
@@ -490,8 +495,8 @@ def generate_lineup(
                 return None, None
 
             curr_relay_teams[relay_name] = relay_team
-            for pair in relay_team:
-                name = pair[0]
+            for swimmer_time in relay_team:
+                name = swimmer_time.name
                 if event_index not in swimmer_events[name]:
                     swimmer_events[name].append(event_index)
 
@@ -500,17 +505,15 @@ def generate_lineup(
 
 def generate_all_lineups(
         prev_event_combinations: dict[str, list[list[int]]], 
-        prev_relay_teams: dict[str, list[tuple[str,str]]],
-        rankings: dict[str, list[tuple[str,str]]],
+        prev_relay_teams: dict[str, list[SwimmerTime]],
+        rankings: dict[str, list[SwimmerTime]],
         relays_per_swimmer: int, 
         top_events, 
         swimmer_event_limits: dict[str, int], 
         all_event_combinations: list[dict[str, list[list[int]]]],
         previous_assigned_events: dict[str, list[int]]
-        ) -> tuple[
-            list[tuple[dict[str, list[int]], dict[str, list[tuple[str,str]]]]],
-            list[dict[str, list[list[int]]]]
-        ]:
+        ) -> list[tuple[dict[str, list[int]], 
+                  dict[str, list[SwimmerTime]]]]:
     '''
     Returns a list of all possible lineups.
 
@@ -626,8 +629,8 @@ def get_fastest_lineup(lineups, gender):
             #hard-coded for one relay team per event
             if len(relay_team) == 0:
                 continue
-            for pair in relay_team:
-                time = pair[1]
+            for swimmer_time in relay_team:
+                time = swimmer_time.time
                 total_time += time
             if total_time == 0:
                 continue
@@ -640,7 +643,7 @@ def get_fastest_lineup(lineups, gender):
 
     return best, best_points
 
-def swimmer_minimum_events(all_rankings: dict[str, list[tuple[str,str]]],
+def swimmer_minimum_events(all_rankings: dict[str, list[SwimmerTime]],
                            relays_per_swimmer: int, 
                            previous_assigned_events):
     '''
@@ -656,8 +659,8 @@ def swimmer_minimum_events(all_rankings: dict[str, list[tuple[str,str]]],
             individual_events = mr_50 if event == "4x50mr" else mr_100
             for individual_event in individual_events:
                 rankings = all_rankings[individual_event]
-                for pair in rankings:
-                    name = pair[0]
+                for swimmer_time in rankings:
+                    name = swimmer_time.name
                     if name in previous_assigned_events and i in previous_assigned_events[name]:
                         # swimmer already swimming this event
                         continue
@@ -670,10 +673,10 @@ def swimmer_minimum_events(all_rankings: dict[str, list[tuple[str,str]]],
             individual_event = FREE_RELAYS[event]
             rankings = all_rankings[individual_event]
             swimmers_added = 0
-            for pair in rankings:
+            for swimmer_time in rankings:
                 if swimmers_added == 4:
                     break
-                name = pair[0]
+                name = swimmer_time.name
                 if name in previous_assigned_events and i in previous_assigned_events[name]:
                     # swimmer already swimming this event
                     continue
@@ -694,7 +697,7 @@ def swimmer_minimum_events(all_rankings: dict[str, list[tuple[str,str]]],
 
     return top_swimmers
 
-def extract_all_rankings(school_name, gender) -> dict[str, list[tuple[str,str]]]:
+def extract_all_rankings(school_name, gender) -> dict[str, list[SwimmerTime]]:
     all_rankings = {}
     for event in INDIVIDUAL_EVENTS:
         all_rankings[event] = extract_rankings(f"times/{gender}/{school_name} - Top Times - {event}.pdf", school_name)
@@ -707,10 +710,10 @@ def remove_swimmers_from_all_rankings(rankings, excluded_swimmers):
 
     for event, stroke_rankings in rankings.items():
         modified_rankings[event] = stroke_rankings.copy()
-        for pair in stroke_rankings:
-            name = pair[0]
+        for swimmer_time in stroke_rankings:
+            name = swimmer_time.name
             if name in excluded_swimmers:
-                modified_rankings[event].remove(pair)
+                modified_rankings[event].remove(swimmer_time)
     
     return modified_rankings
 
@@ -796,7 +799,7 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
         lineup = lineup_data["Lineup"]
         for relay_team in lineup.values():
             for pair in relay_team:
-                name = pair[0]
+                name = pair[1]
                 swimmer_count[name] += 1
                 if swimmer_count[name] <= relays_per_swimmer:
                     continue
@@ -806,7 +809,7 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
 
 def main():
     school_name = "California Institute of Technology"
-    gender = "female"
+    gender = "male"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
