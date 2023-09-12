@@ -543,13 +543,10 @@ def generate_all_lineups(
     lineups : arr
         An array of tuples. Each tuple has the format of (swimmer_events, relay_groups) returned by ``generate_lineup``.
     '''
-    global temp
     
     # ``forbidden_swimmer_arrays`` is a 2-d array of arrays, each called ``forbidden_events``
     # Every ``forbidden_events`` is an array with the same length as ``EVENTS``. If the ``i``th index
     # of ``forbidden_events`` is the swimmer's name, then the swimmer cannot swim the ``i``th event.
-    
-    updated_event_combinations = all_event_combinations.copy()
 
     current_combinations = get_swimmer_combinations(prev_event_combinations)
     
@@ -560,7 +557,7 @@ def generate_all_lineups(
     if len(names) == 0:
         current_combinations.append([])
 
-    for _, curr_combination in enumerate(current_combinations):
+    for curr_combination in current_combinations:
         swimmer_events, relay_teams = generate_lineup(
             rankings, names, curr_combination, 
             prev_relay_teams, swimmer_event_limits, previous_assigned_events,
@@ -598,23 +595,21 @@ def generate_all_lineups(
                     event_combinations[name] = [events]
 
             # checks if current combination has been tried before
-            if event_combinations in updated_event_combinations:
+            if event_combinations in all_event_combinations:
                 continue
 
-            updated_event_combinations.append(event_combinations)
+            all_event_combinations.append(event_combinations)
 
-            generated_lineups, new_event_combinations = generate_all_lineups(
+            generated_lineups = generate_all_lineups(
                 event_combinations, relay_teams, rankings, relays_per_swimmer, 
-                top_events, swimmer_event_limits, updated_event_combinations,
+                top_events, swimmer_event_limits, all_event_combinations,
                 previous_assigned_events)
 
             lineups += generated_lineups
-            #TODO: instead of appending event combinations, add to the same list
-            updated_event_combinations = new_event_combinations
         else:
             lineups.append((swimmer_events, relay_teams))
     
-    return lineups, updated_event_combinations
+    return lineups
 
 def write_rankings(rankings):
     with open('rankings.txt','w') as f:
@@ -751,7 +746,7 @@ def generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gende
         for event in RELAY_EVENTS:
             relay_teams[event] = [None] * 4
 
-        lineups, _ = generate_all_lineups(defaultdict(list), relay_teams, modified_rankings, 
+        lineups = generate_all_lineups(defaultdict(list), relay_teams, modified_rankings, 
                                           relays_per_swimmer, minimum_events, 
                                           swimmer_event_limits, [], previous_assigned_events)
         
@@ -812,11 +807,10 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
                 print(f"{name} set to swim more than {relays_per_swimmer} events.")
                 return
     print(f"All swimmers within {relays_per_swimmer} events.")
-    
 
 def main():
     school_name = "California Institute of Technology"
-    gender = "male"
+    gender = "female"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
