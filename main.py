@@ -277,7 +277,6 @@ def medley_relay_team(rankings: list[list[tuple[str,str]]],
 
     best_time = 0
     best_team = None
-    #TODO: print out teams, i feel like duplicates are being generated
     for team in possible_teams:
         if None in team:
             continue
@@ -798,21 +797,20 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
     data = {}
     with open(f'lineup_{relays_per_event}_rpe_{relays_per_swimmer}_rps_{gender}.json','r') as f:
         data = json.load(f)
-    swimmer_count = {}
+    swimmer_count = defaultdict(int)
     for team in TEAM_NAMES.values():
-        if team in data.keys():
-            lineup_data = data[team]
-            lineup = lineup_data["Lineup"]
-            for relay_team in lineup.values():
-                for pair in relay_team:
-                    name = pair[0]
-                    if name not in swimmer_count.keys():
-                        swimmer_count[name] = 1
-                    else:
-                        swimmer_count[name] += 1
-                        if swimmer_count[name] > relays_per_swimmer:
-                            print(f"{name} set to swim more than {relays_per_swimmer} events.")
-                            return
+        if team not in data.keys():
+            continue
+        lineup_data = data[team]
+        lineup = lineup_data["Lineup"]
+        for relay_team in lineup.values():
+            for pair in relay_team:
+                name = pair[0]
+                swimmer_count[name] += 1
+                if swimmer_count[name] <= relays_per_swimmer:
+                    continue
+                print(f"{name} set to swim more than {relays_per_swimmer} events.")
+                return
     print(f"All swimmers within {relays_per_swimmer} events.")
     
 
