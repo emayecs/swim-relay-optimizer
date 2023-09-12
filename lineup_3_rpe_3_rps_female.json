@@ -6,102 +6,92 @@
     "Lineup": {
       "4x50fr": [
         [
-          [
-            "Brooke Williams",
-            "23.69"
-          ],
-          [
-            "Catherine Deng",
-            "24.54"
-          ],
-          [
-            "Isabel Swafford",
-            "24.76"
-          ],
-          [
-            "Mila Hong",
-            "25.01"
-          ]
+          "Brooke Williams",
+          "23.69"
+        ],
+        [
+          "Catherine Deng",
+          "24.54"
+        ],
+        [
+          "Isabel Swafford",
+          "24.76"
+        ],
+        [
+          "Mila Hong",
+          "25.01"
         ]
       ],
       "4x100fr": [
         [
-          [
-            "Brooke Williams",
-            "51.86"
-          ],
-          [
-            "Isabel Swafford",
-            "53.98"
-          ],
-          [
-            "Vivian Zhang",
-            "54.55"
-          ],
-          [
-            "Joy Shi",
-            "54.61"
-          ]
+          "Brooke Williams",
+          "51.86"
+        ],
+        [
+          "Vivian Zhang",
+          "54.55"
+        ],
+        [
+          "Isabel Swafford",
+          "53.98"
+        ],
+        [
+          "Joy Shi",
+          "54.61"
         ]
       ],
       "4x200fr": [
         [
-          [
-            "Charlotte Zhang",
-            "1:56.85"
-          ],
-          [
-            "Joy Shi",
-            "2:00.49"
-          ],
-          [
-            "Paulina Naydenkov",
-            "2:03.42"
-          ],
-          [
-            "Mila Hong",
-            "2:03.90"
-          ]
+          "Charlotte Zhang",
+          "1:56.85"
+        ],
+        [
+          "Joy Shi",
+          "2:00.49"
+        ],
+        [
+          "Paulina Naydenkov",
+          "2:03.42"
+        ],
+        [
+          "Mila Hong",
+          "2:03.90"
         ]
       ],
       "4x50mr": [
         [
-          [
-            "Isabel Swafford",
-            "27.49"
-          ],
-          [
-            "Charlotte Zhang",
-            "32.33"
-          ],
-          [
-            "Catherine Deng",
-            "25.30"
-          ],
-          [
-            "Brooke Williams",
-            "23.69"
-          ]
+          "Isabel Swafford",
+          "27.49"
+        ],
+        [
+          "Charlotte Zhang",
+          "32.33"
+        ],
+        [
+          "Catherine Deng",
+          "25.30"
+        ],
+        [
+          "Brooke Williams",
+          "23.69"
         ]
       ],
       "4x100mr": [
         [
-          [
-            "Vivian Zhang",
-            "59.26"
-          ],
-          [
-            "Charlotte Zhang",
-            "1:09.47"
-          ],
-          [
-            "Catherine Deng",
-            "55.04"
-          ],
-          [
-            "Joy Shi",
-            "54.61"
-          ]
+          "Vivian Zhang",
+          "59.26"
+        ],
+        [
+          "Charlotte Zhang",
+          "1:09.47"
+        ],
+        [
+          "Catherine Deng",
+          "55.04"
+        ],
+        [
+          "Joy Shi",
+          "54.61"
         ]
       ]
     }
@@ -111,156 +101,92 @@
     "Lineup": {
       "4x50fr": [
         [
-          [
-            "Brea Swartwood",
-            "26.19"
-          ],
-          [
-            "Paulina Naydenkov",
-            "26.37"
-          ],
-          [
-            "Vivian Zhang",
-            "26.39"
-          ],
-          [
-            "Jadelynn Dao",
-            "27.04"
-          ]
+          "Paulina Naydenkov",
+          "26.37"
+        ],
+        [
+          "Brea Swartwood",
+          "26.19"
+        ],
+        [
+          "Jadelynn Dao",
+          "27.04"
+        ],
+        [
+          "Vivian Zhang",
+          "26.39"
         ]
       ],
       "4x100fr": [
         [
-          [
-            "Natalie Lee",
-            "56.08"
-          ],
-          [
-            "Paulina Naydenkov",
-            "58.03"
-          ],
-          [
-            "Julia Gao",
-            "59.75"
-          ],
-          [
-            "Favour Okodogbe",
-            "59.96"
-          ]
+          "Natalie Lee",
+          "56.08"
+        ],
+        [
+          "Paulina Naydenkov",
+          "58.03"
+        ],
+        [
+          "Julia Gao",
+          "59.75"
+        ],
+        [
+          "Favour Okodogbe",
+          "59.96"
         ]
       ],
       "4x200fr": [
         [
-          [
-            "Maddie Swint",
-            "2:04.73"
-          ],
-          [
-            "Olivia Grobowsky",
-            "2:05.45"
-          ],
-          [
-            "Brea Swartwood",
-            "2:08.31"
-          ],
-          [
-            "Julia Gao",
-            "2:18.06"
-          ]
+          "Maddie Swint",
+          "2:04.73"
+        ],
+        [
+          "Olivia Grobowsky",
+          "2:05.45"
+        ],
+        [
+          "Brea Swartwood",
+          "2:08.31"
+        ],
+        [
+          "Julia Gao",
+          "2:18.06"
         ]
       ],
       "4x50mr": [
         [
-          [
-            "Favour Okodogbe",
-            "29.53"
-          ],
-          [
-            "Brea Swartwood",
-            "35.31"
-          ],
-          [
-            "Natalie Lee",
-            "27.97"
-          ],
-          [
-            "Jadelynn Dao",
-            "27.04"
-          ]
+          "Favour Okodogbe",
+          "29.53"
+        ],
+        [
+          "Brea Swartwood",
+          "35.31"
+        ],
+        [
+          "Natalie Lee",
+          "27.97"
+        ],
+        [
+          "Jadelynn Dao",
+          "27.04"
         ]
       ],
       "4x100mr": [
         [
-          [
-            "Maddie Swint",
-            "1:02.93"
-          ],
-          [
-            "Jadelynn Dao",
-            "1:16.85"
-          ],
-          [
-            "Mila Hong",
-            "58.52"
-          ],
-          [
-            "Natalie Lee",
-            "56.08"
-          ]
-        ]
-      ]
-    }
-  },
-  "C Team": {
-    "Average Points Per Relay": 162.4,
-    "Lineup": {
-      "4x50fr": [
+          "Maddie Swint",
+          "1:02.93"
+        ],
         [
-          [
-            "Maddie Swint",
-            "27.47"
-          ],
-          [
-            "Julia Gao",
-            "27.83"
-          ],
-          [
-            "Elizabeth Field",
-            "28.40"
-          ],
-          [
-            "Olivia Grobowsky",
-            "29.19"
-          ]
-        ]
-      ],
-      "4x100fr": [
-        []
-      ],
-      "4x200fr": [
-        []
-      ],
-      "4x50mr": [
-        []
-      ],
-      "4x100mr": [
+          "Jadelynn Dao",
+          "1:16.85"
+        ],
         [
-          [
-            "Favour Okodogbe",
-            "1:05.37"
-          ],
-          [
-            "Elizabeth Field",
-            "1:19.11"
-          ],
-          [
-            "Olivia Grobowsky",
-            "1:08.10"
-          ],
-          [
-            "Elizabeth Field",
-            "1:03.61"
-          ]
+          "Mila Hong",
+          "58.52"
+        ],
+        [
+          "Natalie Lee",
+          "56.08"
         ]
       ]
     }
