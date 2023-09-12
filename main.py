@@ -89,7 +89,7 @@ def calculate_points(event, swim_time, gender):
     base_time = convert_time_to_seconds(base_time)
     return round(1000 * math.pow(base_time/swim_time,3))
 
-def extract_rankings(file_name, team_name):
+def extract_rankings(file_name: str, team_name:str):
     '''
     Returns an ordered array of times for an event.
 
@@ -137,7 +137,7 @@ def extract_rankings(file_name, team_name):
             else:
                 name_index = j
                 break
-        time = time_data[name_index:]
+        time = convert_time_to_seconds(time_data[name_index:])
         rankings.append((name, time))
 
     return rankings
@@ -170,7 +170,7 @@ def new_2d_array(length):
 
 def generate_event_combinations(swimmer_events : dict[str, list[int]],
                                 relays_per_swimmer : int, 
-                                swimmer_event_limits
+                                swimmer_event_limits: dict[str, int]
                                 ) -> tuple[bool, dict[str, list[list[int]]]]:
     '''
     For every swimmer that exceeds ``relays_per_swimmer``, returns all possible combinations of the 
@@ -276,7 +276,7 @@ def medley_relay_helper(rankings: list[list[tuple[str,str]]],
     return possible_teams
 
 def medley_relay_team(rankings: list[list[tuple[str,str]]],
-                      excluded_swimmers: list[str],):
+                      excluded_swimmers: list[str]):
     possible_teams = medley_relay_helper(rankings, [None, None, None, None], excluded_swimmers)
 
     best_time = 0
@@ -286,7 +286,7 @@ def medley_relay_team(rankings: list[list[tuple[str,str]]],
             continue
         total_time = 0
         for pair in team:
-            time = convert_time_to_seconds(pair[1])
+            time = pair[1]
             total_time += time
         if best_team is None or total_time < best_time:
             best_team = team
@@ -627,7 +627,7 @@ def get_fastest_lineup(lineups, gender):
             if len(relay_team) == 0:
                 continue
             for pair in relay_team:
-                time = convert_time_to_seconds(pair[1])
+                time = pair[1]
                 total_time += time
             if total_time == 0:
                 continue
@@ -806,7 +806,7 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
 
 def main():
     school_name = "California Institute of Technology"
-    gender = "male"
+    gender = "female"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
