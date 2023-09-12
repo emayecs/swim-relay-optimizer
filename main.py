@@ -360,7 +360,8 @@ def generate_lineup(
         combination: list[list[int]],
         relay_teams: dict[str, list[tuple[str,str]]],
         swimmer_event_limits: dict[str, int],
-        previous_assigned_events: dict[str, list[int]]
+        previous_assigned_events: dict[str, list[int]],
+        relays_per_swimmer: int
                             ) -> tuple[
                                 dict[str, list[int]], 
                                 dict[str, list[tuple[str,str]]]
@@ -423,8 +424,7 @@ def generate_lineup(
             if pair is None:
                 continue
             name = pair[0]
-            #TODO: replace with relay limit
-            limit = swimmer_event_limits[name] if name in swimmer_event_limits.keys() else 3
+            limit = swimmer_event_limits[name] if name in swimmer_event_limits.keys() else relays_per_swimmer
             if len(swimmer_events[name]) == limit:
                 #condition is necessary to only add events once, otherwise 
                 #if a swimmer is in two medley relays it will overwrite the previous full lineup
@@ -434,8 +434,7 @@ def generate_lineup(
     maxed_swimmers = []
 
     for name, events in swimmer_events.items():
-        #TODO: replace '3' with relays per swimmer
-        limit = swimmer_event_limits[name] if name in swimmer_event_limits.keys() else 3
+        limit = swimmer_event_limits[name] if name in swimmer_event_limits.keys() else relays_per_swimmer
         if len(events) == limit:
             maxed_swimmers.append(name)
     
@@ -564,7 +563,8 @@ def generate_all_lineups(
     for _, curr_combination in enumerate(current_combinations):
         swimmer_events, relay_teams = generate_lineup(
             rankings, names, curr_combination, 
-            prev_relay_teams, swimmer_event_limits, previous_assigned_events)
+            prev_relay_teams, swimmer_event_limits, previous_assigned_events,
+            relays_per_swimmer)
 
         if swimmer_events is None:
             # not enough swimmers for one of the relays, skip this combination
@@ -816,7 +816,7 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
 
 def main():
     school_name = "California Institute of Technology"
-    gender = "female"
+    gender = "male"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
