@@ -12,6 +12,10 @@ RELAY_EVENTS = [
     "4x100mr",
     ]
 
+MEDLEY_RELAY_INDIVIDUAL_EVENTS = {
+    "4x50mr" : ["50ba", "50br", "50fl", "50fr"],
+    "4x100mr" : ["100ba", "100br", "100fl", "100fr"]
+}
 INDIVIDUAL_TO_RELAY_INDICES = {
     "50fr" : [0, 3],
     "100fr" : [1, 4],
@@ -253,7 +257,7 @@ def medley_relay_helper(rankings: list[list[tuple[str,str]]],
         name = new_team[i][0]
         name_count[name].append(i)
 
-    # TODO: run recursive method after entire for loop is done
+    # TODO: this can be slightly optimized but it'll be very insignificant
     for name in name_count.keys():
         indices = name_count[name]
         if len(indices) > 1:
@@ -476,17 +480,9 @@ def generate_lineup(
             #medley relays
             medley_rankings = []
 
-            #TODO: make this cleaner with list/dict
-            if relay_name == "4x50mr":
-                medley_rankings.append(all_rankings["50ba"])
-                medley_rankings.append(all_rankings["50br"])
-                medley_rankings.append(all_rankings["50fl"])
-                medley_rankings.append(all_rankings["50fr"])
-            else:
-                medley_rankings.append(all_rankings["100ba"])
-                medley_rankings.append(all_rankings["100br"])
-                medley_rankings.append(all_rankings["100fl"])
-                medley_rankings.append(all_rankings["100fr"])
+            for individual_event in MEDLEY_RELAY_INDIVIDUAL_EVENTS[relay_name]:
+                rankings = all_rankings[individual_event]
+                medley_rankings.append(rankings)
             
             relay_team = medley_relay_team(medley_rankings, excluded_swimmers)
 
@@ -810,7 +806,7 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
 
 def main():
     school_name = "California Institute of Technology"
-    gender = "female"
+    gender = "male"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
