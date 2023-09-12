@@ -1,5 +1,4 @@
-import PyPDF2, json, math, pprint
-import tracemalloc
+import PyPDF2, json, math
 import itertools as itt
 from time import perf_counter
 from collections import defaultdict
@@ -818,17 +817,12 @@ def check_swimmer_limit(relays_per_event, relays_per_swimmer, gender):
     
 
 def main():
-    tracemalloc.start()
-
     school_name = "California Institute of Technology"
     gender = "female"
     teams_per_event = 3
     relays_per_swimmer = 3
     generate_best_lineup(teams_per_event, relays_per_swimmer, school_name, gender)
     check_swimmer_limit(teams_per_event, relays_per_swimmer, gender)
-
-    print(tracemalloc.get_traced_memory())
-    tracemalloc.stop()
 
 if __name__=="__main__":
     main()
